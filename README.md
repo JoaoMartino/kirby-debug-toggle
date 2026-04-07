@@ -37,7 +37,7 @@ The built-in Kirby workarounds for toggling debug mode didn't fully fit my needs
 ### Composer Installation
 
 ```bash
-composer require martino/debug-toggle
+composer require martino/kirby-debug-toggle
 ```
 
 ## Configuration
