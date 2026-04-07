@@ -15,6 +15,10 @@ A Kirby 5 CMS panel plugin that provides a safe, time-limited debug mode toggle 
 - **Dark/Light mode** - Fully responsive to Kirby panel theme
 - **Real-time status** - Shows who enabled debug and when it expires
 
+## Demo
+ 
+![Debug Toggle Demo](.github/assets/kirby-debug-toggle.gif)
+
 ## Why this exists
 
 The built-in Kirby workarounds for toggling debug mode didn't fully fit my needs. So I built this for myself. It does exactly what I need and nothing more. If it fits yours too, feel free to use it.
