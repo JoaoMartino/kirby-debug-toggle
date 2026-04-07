@@ -1,0 +1,195 @@
+/**
+ * Debug Toggle Card Styles
+ * Kirby 5: Dark mode (default) + Light mode support
+ * Kirby 4: Fallback to white background
+ */
+
+/* ============================================
+   Card Container
+   ============================================ */
+
+.debug-toggle-card {
+  position: relative;
+  min-width: min(25vw, 400px);
+  max-width: 500px;
+  height: 148px;
+  grid-template-rows: 1fr auto;
+  gap: var(--spacing-4);
+  padding: var(--spacing-2);
+  margin-bottom: .7rem;
+  background: var(--item-color-back);
+  box-shadow: var(--item-shadow);
+  border-radius: var(--rounded);
+}
+
+/* Kirby 4 fallback - when no theme attribute exists on panel */
+.k-panel:not([data-theme]) .debug-toggle-card {
+  background: white;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================
+   Card Content
+   ============================================ */
+
+.debug-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+/* Info Rows */
+.debug-info-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-4);
+  transition: opacity 0.2s;
+}
+
+.debug-info-row.is-dimmed {
+  opacity: 0.4;
+}
+
+.debug-label {
+  font-size: var(--text-sm);
+  flex-shrink: 0;
+  min-width: 9ch;
+}
+
+.debug-value {
+  font-size: var(--text-sm);
+  color: var(--color-white);
+  text-align: right;
+}
+
+.debug-info-row:first-child .debug-value {
+  font-size: var(--text-base);
+  font-weight: 500;
+}
+
+.debug-toggle-card.is-active .debug-info-row:first-child .debug-value {
+  color: var(--color-white);
+}
+
+/* Warning Messages */
+.debug-warning {
+  margin-top: var(--spacing-3);
+  font-size: var(--text-sm);
+  line-height: 18px;
+}
+
+.debug-warning-active-text {
+  color: var(--color-orange-500);
+  font-weight: 500;
+}
+
+.debug-warning-inactive > span {
+  color: var(--color-green-500);
+  font-weight: 500;
+}
+
+/* Status Indicator Dot */
+.debug-indicator {
+  position: absolute;
+  top: var(--spacing-2);
+  right: var(--spacing-2);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-gray-600);
+  transition: background 0.2s;
+}
+
+.debug-indicator.is-active {
+  background: var(--color-orange-500);
+}
+
+/* ============================================
+   Toggle Button
+   ============================================ */
+
+.debug-toggle-button {
+  width: 11ch;
+  justify-content: center;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.debug-toggle-button.is-active {
+  --button-color-back: var(--color-orange-600);
+  --button-color-text: black;
+}
+
+.debug-toggle-button.is-active:hover {
+  --button-color-back: var(--color-orange-700);
+}
+
+.debug-toggle-button:not(.is-active) {
+  --button-color-back: var(--color-gray-700);
+  --button-color-text: var(--color-white);
+  background: var(--item-color-back);
+}
+
+.debug-toggle-button:not(.is-active):hover {
+  background: black;
+}
+
+/* Kirby 4 fallback - when no theme attribute exists on panel */
+.k-panel:not([data-theme]) .debug-toggle-button:not(.is-active) {
+  background: white;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================
+   Light Mode Overrides
+   ============================================ */
+
+@media (prefers-color-scheme: light) {
+  /* Text Colors */
+  .debug-value {
+    color: var(--color-black);
+  }
+  
+  .debug-toggle-card.is-active .debug-info-row:first-child .debug-value {
+    color: var(--color-black);
+  }
+  
+  /* Warning Messages */
+  .debug-warning-active-text {
+    color: var(--color-orange-600);
+  }
+  
+  .debug-warning-inactive > span {
+    color: var(--color-green-600);
+  }
+  
+  /* Status Indicator */
+  .debug-indicator {
+    background: var(--color-gray-400);
+  }
+  
+  .debug-indicator.is-active {
+    background: var(--color-orange-600);
+  }
+  
+  /* Toggle Button */
+  .debug-toggle-button.is-active {
+    --button-color-back: var(--color-orange-600);
+  }
+  
+  .debug-toggle-button.is-active:hover {
+    --button-color-back: var(--color-orange-500);
+  }
+  
+  .debug-toggle-button:not(.is-active) {
+    --button-color-back: var(--item-color-back);
+    --button-color-text: var(--color-black);
+    box-shadow: var(--item-shadow);
+  }
+  
+  .debug-toggle-button:not(.is-active):hover {
+    --button-color-back: var(--color-gray-400);
+    background: var(--color-gray-500);
+  }
+}
+
