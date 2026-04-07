@@ -1,7 +1,6 @@
 {
   "name": "martino/debug-toggle",
   "description": "A Kirby 5 CMS panel plugin for safe, time-limited debug mode toggling with automatic expiry",
-  "version": "1.0.0",
   "type": "kirby-plugin",
   "license": "MIT",
   "authors": [
