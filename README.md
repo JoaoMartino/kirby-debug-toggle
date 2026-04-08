@@ -46,11 +46,12 @@ composer require martino/kirby-debug-toggle
 
 ## Configuration
 
-Add the following to your `site/config/config.php`:
+**⚠️ Required:** Add the following to your `site/config/config.php`:
 
 ```php
 return [
-    // Debug mode controlled by flag file
+    // REQUIRED: Debug mode controlled by flag file
+    // Replace any existing 'debug' => true with this closure
     'debug' => (function() {
         $flag = __DIR__ . '/.debug_enabled';
         if (!file_exists($flag)) return false;
@@ -59,11 +60,13 @@ return [
         return time() < $data['expires_at'];
     })(),
     
-    // Plugin configuration (optional)
+    // OPTIONAL: Plugin configuration (uses defaults if omitted)
     'Martino.debug-toggle.expiry-hours' => 4,  // Hours until auto-disable (default: 4)
     'Martino.debug-toggle.permission' => 'admin',  // Who can toggle (default: 'admin')
 ];
 ```
+
+**Important:** The `debug` closure is required for the plugin to work. Without it, the panel UI will appear but debug mode won't actually activate when toggled.
 
 ## Configuration Options
 
