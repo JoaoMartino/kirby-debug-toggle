@@ -51,35 +51,9 @@ composer require martino/kirby-debug-toggle
 
 ```php
 return [
-    // REQUIRED: Debug mode controlled by flag file
-    // Replace any existing 'debug' => true with this closure
-    'debug' => (function() {
-        // Auto-enable debug for panel when authorized users are logged in
-        $kirby = kirby();
-        if ($kirby->user()) {
-            $panelAutoDebug = $kirby->option('Martino.debug-toggle.panel-auto-debug', true);
-            if ($panelAutoDebug && $kirby->path() && str_starts_with($kirby->path(), 'panel')) {
-                $permission = $kirby->option('Martino.debug-toggle.permission', 'admin');
-                $user = $kirby->user();
-                
-                // Check permission
-                if (is_callable($permission)) {
-                    if ($permission($user)) return true;
-                } elseif ($permission === 'admin' && $user->isAdmin()) {
-                    return true;
-                } elseif (is_string($permission) && $user->role()->name() === $permission) {
-                    return true;
-                }
-            }
-        }
-        
-        // Check flag file for manual toggle
-        $flag = __DIR__ . '/.debug_enabled';
-        if (!file_exists($flag)) return false;
-        $data = json_decode(file_get_contents($flag), true);
-        if (!$data || empty($data['expires_at'])) return false;
-        return time() < $data['expires_at'];
-    })(),
+    // REQUIRED: Debug mode controlled by the plugin
+    // Replace any existing 'debug' => true with this
+    'debug' => debugShouldEnable(),
     
     // OPTIONAL: Plugin configuration (uses defaults if omitted)
     'Martino.debug-toggle.expiry-hours' => 4,  // Hours until auto-disable (default: 4)
@@ -88,7 +62,7 @@ return [
 ];
 ```
 
-**Important:** The `debug` closure is required for the plugin to work. Without it, the panel UI will appear but debug mode won't actually activate when toggled.
+**Important:** The `'debug' => debugShouldEnable()'` line is required for the plugin to work. Without it, the panel UI will appear but debug mode won't actually activate when toggled.
 
 **Panel Auto-Debug:** By default, debug mode is automatically enabled in the panel for authorized users (even when the toggle is OFF). This prevents panel corruption from hiding errors. You can disable this by setting `'Martino.debug-toggle.panel-auto-debug' => false`.
 
