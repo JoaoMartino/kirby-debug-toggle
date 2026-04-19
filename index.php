@@ -6,6 +6,26 @@
  * Add this to site/config/config.php:
  * 
  * 'debug' => (function() {
+ *     // Auto-enable debug for panel when authorized users are logged in
+ *     $kirby = kirby();
+ *     if ($kirby->user()) {
+ *         $panelAutoDebug = $kirby->option('Martino.debug-toggle.panel-auto-debug', true);
+ *         if ($panelAutoDebug && $kirby->path() && str_starts_with($kirby->path(), 'panel')) {
+ *             $permission = $kirby->option('Martino.debug-toggle.permission', 'admin');
+ *             $user = $kirby->user();
+ *             
+ *             // Check permission
+ *             if (is_callable($permission)) {
+ *                 if ($permission($user)) return true;
+ *             } elseif ($permission === 'admin' && $user->isAdmin()) {
+ *                 return true;
+ *             } elseif (is_string($permission) && $user->role()->name() === $permission) {
+ *                 return true;
+ *             }
+ *         }
+ *     }
+ *     
+ *     // Check flag file for manual toggle
  *     $flag = __DIR__ . '/.debug_enabled';
  *     if (!file_exists($flag)) return false;
  *     $data = json_decode(file_get_contents($flag), true);
@@ -16,6 +36,7 @@
  * Optional config:
  * 'Martino.debug-toggle.expiry-hours' => 4,  // Hours until auto-disable (default: 4)
  * 'Martino.debug-toggle.permission' => 'admin',  // 'admin', role name, or callback (default: 'admin')
+ * 'Martino.debug-toggle.panel-auto-debug' => true,  // Auto-enable debug for panel (default: true)
  * 
  * Permission examples:
  * 'Martino.debug-toggle.permission' => 'admin',  // Only admins (uses isAdmin())

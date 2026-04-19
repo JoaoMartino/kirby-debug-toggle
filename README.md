@@ -8,11 +8,12 @@ A Kirby 5 CMS panel plugin that provides a safe, time-limited debug mode toggle 
 ## Features
 
 - **Flag-based debug control** - Uses a `.debug_enabled` flag file instead of modifying `config.php`
+- **Panel auto-debug** - Automatically enables debug for panel when authorized users are logged in (prevents panel lockout)
 - **Auto-expiry** - Debug mode automatically disables after configured hours
 - **Permission system** - Restrict access by admin status, role name, or custom callback
 - **Git-safe** - Automatically adds flag file to `.gitignore`
 - **Panel UI** - Clean card-based interface with status indicator
-- **Dark/Light mode** - Fully responsive to Kirby panel theme
+- **Dark/Light mode** - Fully responsive to Kirby panel theme (Kirby 5) and fallback for Kirby 4
 - **Real-time status** - Shows who enabled debug and when it expires
 
 ## Demo
@@ -53,6 +54,26 @@ return [
     // REQUIRED: Debug mode controlled by flag file
     // Replace any existing 'debug' => true with this closure
     'debug' => (function() {
+        // Auto-enable debug for panel when authorized users are logged in
+        $kirby = kirby();
+        if ($kirby->user()) {
+            $panelAutoDebug = $kirby->option('Martino.debug-toggle.panel-auto-debug', true);
+            if ($panelAutoDebug && $kirby->path() && str_starts_with($kirby->path(), 'panel')) {
+                $permission = $kirby->option('Martino.debug-toggle.permission', 'admin');
+                $user = $kirby->user();
+                
+                // Check permission
+                if (is_callable($permission)) {
+                    if ($permission($user)) return true;
+                } elseif ($permission === 'admin' && $user->isAdmin()) {
+                    return true;
+                } elseif (is_string($permission) && $user->role()->name() === $permission) {
+                    return true;
+                }
+            }
+        }
+        
+        // Check flag file for manual toggle
         $flag = __DIR__ . '/.debug_enabled';
         if (!file_exists($flag)) return false;
         $data = json_decode(file_get_contents($flag), true);
@@ -63,10 +84,13 @@ return [
     // OPTIONAL: Plugin configuration (uses defaults if omitted)
     'Martino.debug-toggle.expiry-hours' => 4,  // Hours until auto-disable (default: 4)
     'Martino.debug-toggle.permission' => 'admin',  // Who can toggle (default: 'admin')
+    'Martino.debug-toggle.panel-auto-debug' => true,  // Auto-enable debug for panel (default: true)
 ];
 ```
 
 **Important:** The `debug` closure is required for the plugin to work. Without it, the panel UI will appear but debug mode won't actually activate when toggled.
+
+**Panel Auto-Debug:** By default, debug mode is automatically enabled in the panel for authorized users (even when the toggle is OFF). This prevents panel corruption from hiding errors. You can disable this by setting `'Martino.debug-toggle.panel-auto-debug' => false`.
 
 ## Configuration Options
 
@@ -107,6 +131,25 @@ Controls who can access and toggle debug mode.
        return in_array($user->email(), ['dev@example.com', 'admin@example.com']);
    },
    ```
+
+### `Martino.debug-toggle.panel-auto-debug`
+
+**Type:** `bool`  
+**Default:** `true`
+
+Automatically enables debug mode in the panel for authorized users, even when the toggle is OFF.
+
+**Why this exists:** If the panel breaks due to an error, you need debug mode to see what went wrong. With this enabled, authorized users always see panel errors, preventing you from being locked out.
+
+```php
+'Martino.debug-toggle.panel-auto-debug' => true,  // Always show panel errors to authorized users
+'Martino.debug-toggle.panel-auto-debug' => false, // Disable auto-debug (not recommended)
+```
+
+**Behavior:**
+- ✅ **Frontend:** Controlled by the toggle (manual)
+- ✅ **Panel (authorized users):** Always ON (auto-debug)
+- ✅ **Panel (public/unauthorized):** Controlled by the toggle
 
 ## Usage
 
