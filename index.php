@@ -60,28 +60,33 @@ function debugFlagActive(): bool
 
 function debugShouldEnable(): bool
 {
-    $kirby = kirby();
-    
-    // Auto-enable debug for panel when authorized users are logged in
-    if ($kirby->user()) {
-        $panelAutoDebug = $kirby->option('Martino.debug-toggle.panel-auto-debug', true);
-        if ($panelAutoDebug && $kirby->path() && str_starts_with($kirby->path(), 'panel')) {
-            $permission = $kirby->option('Martino.debug-toggle.permission', 'admin');
-            $user = $kirby->user();
-            
-            // Check permission
-            if (is_callable($permission)) {
-                if ($permission($user)) return true;
-            } elseif ($permission === 'admin' && $user->isAdmin()) {
-                return true;
-            } elseif (is_string($permission) && $user->role()->name() === $permission) {
-                return true;
+    try {
+        $kirby = kirby();
+        
+        // Auto-enable debug for panel when authorized users are logged in
+        if ($kirby->user()) {
+            $panelAutoDebug = $kirby->option('Martino.debug-toggle.panel-auto-debug', true);
+            if ($panelAutoDebug && $kirby->path() && str_starts_with($kirby->path(), 'panel')) {
+                $permission = $kirby->option('Martino.debug-toggle.permission', 'admin');
+                $user = $kirby->user();
+                
+                // Check permission
+                if (is_callable($permission)) {
+                    if ($permission($user)) return true;
+                } elseif ($permission === 'admin' && $user->isAdmin()) {
+                    return true;
+                } elseif (is_string($permission) && $user->role()->name() === $permission) {
+                    return true;
+                }
             }
         }
+        
+        // Check flag file for manual toggle
+        return debugFlagActive();
+    } catch (\Throwable $e) {
+        // If called too early (before Kirby is initialized), just check the flag file
+        return debugFlagActive();
     }
-    
-    // Check flag file for manual toggle
-    return debugFlagActive();
 }
 
 function debugHasPermission(): bool
