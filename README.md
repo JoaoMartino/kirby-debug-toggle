@@ -53,7 +53,7 @@ composer require martino/kirby-debug-toggle
 return [
     // REQUIRED: Debug mode controlled by the plugin
     // Replace any existing 'debug' => true with this
-    'debug' => debugShouldEnable(),
+    'debug' => fn() => debugShouldEnable(),
     
     // OPTIONAL: Plugin configuration (uses defaults if omitted)
     'Martino.debug-toggle.expiry-hours' => 4,  // Hours until auto-disable (default: 4)
@@ -62,7 +62,7 @@ return [
 ];
 ```
 
-**Important:** The `'debug' => debugShouldEnable()'` line is required for the plugin to work. Without it, the panel UI will appear but debug mode won't actually activate when toggled.
+**Important:** The `'debug' => fn() => debugShouldEnable()'` line is required for the plugin to work. The arrow function (`fn()`) ensures the plugin is loaded before the function is called. Without it, you'll get an "undefined function" error.
 
 **Panel Auto-Debug:** By default, debug mode is automatically enabled in the panel for authorized users (even when the toggle is OFF). This prevents panel corruption from hiding errors. You can disable this by setting `'Martino.debug-toggle.panel-auto-debug' => false`.
 

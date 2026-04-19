@@ -5,7 +5,7 @@
  * 
  * REQUIRED: Add this to site/config/config.php:
  * 
- * 'debug' => debugShouldEnable(),
+ * 'debug' => fn() => debugShouldEnable(),
  * 
  * OPTIONAL: Plugin configuration (uses defaults if omitted):
  * 
