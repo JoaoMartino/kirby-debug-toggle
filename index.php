@@ -5,7 +5,13 @@
  * 
  * REQUIRED: Add this to site/config/config.php:
  * 
- * 'debug' => fn() => debugShouldEnable(),
+ * 'debug' => (function() {
+ *     $flag = __DIR__ . '/.debug_enabled';
+ *     if (!file_exists($flag)) return false;
+ *     $data = @json_decode(file_get_contents($flag), true);
+ *     if (!$data || empty($data['expires_at'])) return false;
+ *     return time() < $data['expires_at'];
+ * })(),
  * 
  * OPTIONAL: Plugin configuration (uses defaults if omitted):
  * 
@@ -139,7 +145,27 @@ function ensureGitIgnore(): void
 Kirby::plugin('Martino/debug-toggle', [
     'options' => [
         'expiry-hours' => 4,
-        'permission' => 'admin'
+        'permission' => 'admin',
+        'panel-auto-debug' => true
+    ],
+    
+    'hooks' => [
+        'system.loadPlugins:after' => function() {
+            $kirby = kirby();
+            
+            // Enable debug for panel when authorized users are logged in
+            if ($kirby->user() && $kirby->option('Martino.debug-toggle.panel-auto-debug', true)) {
+                if ($kirby->path() && str_starts_with($kirby->path(), 'panel')) {
+                    if (debugHasPermission()) {
+                        $kirby->extend([
+                            'options' => [
+                                'debug' => true
+                            ]
+                        ]);
+                    }
+                }
+            }
+        }
     ],
     
     'assets' => [
